@@ -39,7 +39,7 @@
          web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
        }
 
-       web3.eth.defaultAccount = web3.eth.accounts[0]; // choosing the web3 defaultAccount
+       web3.eth.defaultAccount = web3.eth.accounts[1]; // choosing the web3 defaultAccount
 
         //initialises the contract on the address
        var CoursetroContract = web3.eth.contract([
@@ -80,6 +80,12 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
 		"anonymous": false,
 		"inputs": [
 			{
@@ -98,7 +104,7 @@
 	}
 ])
 
-var Coursetro = CoursetroContract.at('0xa8c566ddd72f3ee8444bdd664fd03671ac43e39e')
+var Coursetro = CoursetroContract.at('0x6303b14110e58546b1541e81464bc14dac197b92')
 
 console.log(Coursetro);
 
@@ -116,7 +122,12 @@ instructorEvent.watch(function(error, result){
 })
 
 $('#button').click(function(){
-  Coursetro.setInstructor($('#name').val(), $('#age').val());
+  Coursetro.setInstructor($('#name').val(), $('#age').val(), (err, res) => {
+    if(err){
+      $("#loader").hide();
+      console.log(err);
+    }
+  });
   $("#loader").show();
 })
 </script>
