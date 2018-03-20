@@ -12,124 +12,76 @@
 
 </head>
 <body>
-    <div class="container">
+  <div class="container">
 
-        <h1>First Smart Contract</h1>
+      <h1>First Smart Contract</h1>
+      <span id="countIns"></span>
 
-        <h2 id="instructor"></h2>
-        <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
-        <label for="name" class="col-lg-2 control-label">Instructor Name</label>
-        <input id="name" type="text">
+      <h2 id="instructor"></h2>
+      <span id="insTrans"></span>
+      <hr>
 
-        <label for="name" class="col-lg-2 control-label">Instructor Age</label>
-        <input id="age" type="text">
+      <img id="loader" src="https://loading.io/spinners/double-ring/lg.double-ring-spinner.gif">
 
-        <button id="button">Update Instructor</button>
+      <label for="fName" class="col-lg-2 control-label">First Name</label>
+      <input id="fName" type="text">
 
+      <label for="lName" class="col-lg-2 control-label">Last Name</label>
+      <input id="lName" type="text">
 
-    </div>
+      <label for="age" class="col-lg-2 control-label">Instructor Age</label>
+      <input id="age" type="text">
+
+      <button id="button">Update Instructor</button>
+
+  </div>
 
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
 
-    <script>
-       if (typeof web3 !== 'undefined'){
-         web3 = new Web3(web3.currentProvider)
-       }
-       else{
-         web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-       }
-
-       web3.eth.defaultAccount = web3.eth.accounts[1]; // choosing the web3 defaultAccount
-
-        //initialises the contract on the address
-       var CoursetroContract = web3.eth.contract([
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "_fName",
-				"type": "string"
-			},
-			{
-				"name": "_age",
-				"type": "uint256"
-			}
-		],
-		"name": "setInstructor",
-		"outputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getInstructor",
-		"outputs": [
-			{
-				"name": "",
-				"type": "string"
-			},
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"name": "name",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"name": "age",
-				"type": "uint256"
-			}
-		],
-		"name": "Instructor",
-		"type": "event"
-	}
-])
-
-var Coursetro = CoursetroContract.at('0x6303b14110e58546b1541e81464bc14dac197b92')
-
-console.log(Coursetro);
-
-var instructorEvent = Coursetro.Instructor();
-
-instructorEvent.watch(function(error, result){
-  if (!error)
-  {
-      $("#loader").hide();
-      $("#instructor").html(result.args.name + ' (' + result.args.age + ' years old)');
-  } else {
-      $("#loader").hide();
-      console.log(error);
+<script>
+  if (typeof web3 !== 'undefined'){
+   web3 = new Web3(web3.currentProvider)
   }
-})
+  else{
+   web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
+  }
 
-$('#button').click(function(){
-  Coursetro.setInstructor($('#name').val(), $('#age').val(), (err, res) => {
-    if(err){
-      $("#loader").hide();
-      console.log(err);
-    }
-  });
-  $("#loader").show();
-})
+  web3.eth.defaultAccount = web3.eth.accounts[1]; // choosing the web3 defaultAccount
+
+  //initialises the contract on the address
+  var CourseContract = web3.eth.contract(PASTE ABI HERE);
+
+  var Courses = CourseContract.at('PASTE ADDRESS HERE');
+
+  console.log(Courses);
+
+  var instructorEvent = Courses.instructorInfo({},'latest');
+
+  instructorEvent.watch(function(error, result) {
+   if (result) {
+       if (result.blockHash != $("#insTrans").html())
+            $("#loader").hide();
+
+       $("#insTrans").html('Block hash: ' + result.blockHash);
+       $("#instructor").html(web3.toAscii(result.args.fName) + ' ' + web3.toAscii(result.args.lName) + ' (' + result.args.age + ' years old)');
+   } else {
+        $("#loader").hide();
+   }
+});
+
+ Courses.countInstructors((err, res) => {
+     if (res)
+      $("#countIns").html(res.c + ' Instructors');
+ })
+
+ $("#button").click(function() {
+      $("#loader").show();
+     Courses.setInstructor(web3.eth.defaultAccount, $("#age").val(), $("#fName").val(), $("#lName").val(), (err, res) => {
+         if (err) {
+             $("#loader").hide();
+         }
+     });
+ });
 </script>
 
 </body>
